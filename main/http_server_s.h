@@ -1,3 +1,5 @@
+#ifndef MYHTTPSERVERLIBS
+#define MYHTTPSERVERLIBS
 
 #include <string.h>
 #include <stdlib.h>
@@ -109,7 +111,7 @@ static esp_err_t hello_get_handler(httpd_req_t *req)
 
     /* Send response with custom headers and body set as the
      * string passed in user context*/
-    const char* resp_str = (const char*) req->user_ctx;
+    const char* resp_str = "Hello World!" ; //(const char*) req->user_ctx;
     httpd_resp_send(req, resp_str, HTTPD_RESP_USE_STRLEN);
 
     /* After sending the HTTP response the old HTTP request
@@ -126,7 +128,7 @@ static const httpd_uri_t hello = {
     .handler   = hello_get_handler,
     /* Let's pass response string in user
      * context to demonstrate it's usage */
-    .user_ctx  = "Hello World!"
+    .user_ctx  = NULL  // "Hello World!"
 };
 
 /* An HTTP POST handler */
@@ -279,13 +281,6 @@ static httpd_handle_t start_webserver(void)
 {
     httpd_handle_t server = NULL;
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-#if CONFIG_IDF_TARGET_LINUX
-    // Setting port as 8001 when building for Linux. Port 80 can be used only by a priviliged user in linux.
-    // So when a unpriviliged user tries to run the application, it throws bind error and the server is not started.
-    // Port 8001 can be used by an unpriviliged user as well. So the application will not throw bind error and the
-    // server will be started.
-    config.server_port = 8001;
-#endif // !CONFIG_IDF_TARGET_LINUX
     config.lru_purge_enable = true;
 
     // Start the httpd server
@@ -337,3 +332,5 @@ static void connect_handler(void* arg, esp_event_base_t event_base,
     }
 }
 #endif // !CONFIG_IDF_TARGET_LINUX
+
+#endif
